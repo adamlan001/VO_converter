@@ -29,6 +29,14 @@ def main() -> int:
         print(f"Input file does not exist: {args.input_file}", file=sys.stderr)
         return 1
 
+    if not args.input_file.is_file():
+        print(f"Input path is not a file: {args.input_file}", file=sys.stderr)
+        return 1
+
+    if args.output_file.exists() and args.output_file.is_dir():
+        print(f"Output path is a directory: {args.output_file}", file=sys.stderr)
+        return 1
+
     if args.output_file.exists() and not args.overwrite:
         print(
             f"Output file already exists: {args.output_file}. Use --overwrite to replace it.",
@@ -47,7 +55,7 @@ def main() -> int:
     command.append(str(args.output_file))
 
     result = subprocess.run(command, check=False, capture_output=True, text=True)
-    if result.returncode != 0 and result.stderr:
+    if result.stderr:
         print(result.stderr, file=sys.stderr, end="")
     return result.returncode
 
