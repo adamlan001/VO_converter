@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+FFMPEG_TIMEOUT_SECONDS = 3600
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Convert audio/video files with ffmpeg.")
@@ -60,13 +62,13 @@ def main() -> int:
             check=False,
             capture_output=True,
             text=True,
-            timeout=3600,
+            timeout=FFMPEG_TIMEOUT_SECONDS,
         )
     except subprocess.TimeoutExpired:
-        print("ffmpeg timed out after 3600 seconds.", file=sys.stderr)
+        print(f"ffmpeg timed out after {FFMPEG_TIMEOUT_SECONDS} seconds.", file=sys.stderr)
         return 1
 
-    if result.stderr:
+    if result.returncode != 0 and result.stderr:
         print(result.stderr, file=sys.stderr, end="")
     return result.returncode
 
