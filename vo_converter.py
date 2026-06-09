@@ -12,6 +12,13 @@ from pathlib import Path
 FFMPEG_TIMEOUT_SECONDS = 3600
 
 
+def positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("timeout must be a positive integer")
+    return parsed
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Convert audio/video files with ffmpeg.")
     parser.add_argument("input_file", type=Path, help="Path to the input media file")
@@ -20,6 +27,12 @@ def parse_args() -> argparse.Namespace:
         "--overwrite",
         action="store_true",
         help="Overwrite output file if it already exists",
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=positive_int,
+        default=FFMPEG_TIMEOUT_SECONDS,
+        help=f"Maximum ffmpeg runtime in seconds (default: {FFMPEG_TIMEOUT_SECONDS})",
     )
     return parser.parse_args()
 
@@ -62,10 +75,10 @@ def main() -> int:
             check=False,
             capture_output=True,
             text=True,
-            timeout=FFMPEG_TIMEOUT_SECONDS,
+            timeout=args.timeout_seconds,
         )
     except subprocess.TimeoutExpired:
-        print(f"ffmpeg timed out after {FFMPEG_TIMEOUT_SECONDS} seconds.", file=sys.stderr)
+        print(f"ffmpeg timed out after {args.timeout_seconds} seconds.", file=sys.stderr)
         return 1
 
     if result.returncode != 0 and result.stderr:
