@@ -64,10 +64,10 @@ def main() -> int:
         print("ffmpeg is not installed or not available in PATH.", file=sys.stderr)
         return 1
 
-    command = [ffmpeg, "-i", str(args.input_file)]
+    command = [ffmpeg]
     if args.overwrite:
         command.append("-y")
-    command.append(str(args.output_file))
+    command.extend(["-i", str(args.input_file), str(args.output_file)])
 
     try:
         result = subprocess.run(
@@ -86,6 +86,8 @@ def main() -> int:
             print(result.stderr, file=sys.stderr, end="")
         else:
             print("ffmpeg failed without error output.", file=sys.stderr)
+    else:
+        print(f"Conversion complete: {args.output_file}")
     return result.returncode
 
 
