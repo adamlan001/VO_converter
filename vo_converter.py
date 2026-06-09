@@ -44,11 +44,11 @@ def main() -> int:
     command = [ffmpeg, "-i", str(args.input_file)]
     if args.overwrite:
         command.append("-y")
-    else:
-        command.append("-n")
     command.append(str(args.output_file))
 
-    result = subprocess.run(command, check=False)
+    result = subprocess.run(command, check=False, capture_output=True, text=True)
+    if result.returncode != 0 and result.stderr:
+        print(result.stderr, file=sys.stderr, end="")
     return result.returncode
 
 
