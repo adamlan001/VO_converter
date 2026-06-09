@@ -54,7 +54,18 @@ def main() -> int:
         command.append("-y")
     command.append(str(args.output_file))
 
-    result = subprocess.run(command, check=False, capture_output=True, text=True)
+    try:
+        result = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=3600,
+        )
+    except subprocess.TimeoutExpired:
+        print("ffmpeg timed out after 3600 seconds.", file=sys.stderr)
+        return 1
+
     if result.stderr:
         print(result.stderr, file=sys.stderr, end="")
     return result.returncode
