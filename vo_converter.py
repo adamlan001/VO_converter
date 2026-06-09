@@ -81,8 +81,11 @@ def main() -> int:
         print(f"ffmpeg timed out after {args.timeout_seconds} seconds.", file=sys.stderr)
         return 1
 
-    if result.returncode != 0 and result.stderr:
-        print(result.stderr, file=sys.stderr, end="")
+    if result.returncode != 0:
+        if result.stderr:
+            print(result.stderr, file=sys.stderr, end="")
+        else:
+            print("ffmpeg failed without error output.", file=sys.stderr)
     return result.returncode
 
 
